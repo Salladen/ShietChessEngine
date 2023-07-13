@@ -10,6 +10,9 @@ import java.util.*;
 public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C extends Colors> {
     public T position;
     final C color;
+    //TODO: This should be a set, not a collection.
+    // This is a prime example of our generics getting out of hand, but it will simply be cryptic in docstrings in the future and not a pain to work with,
+    // so yet again, we might as well make it easier for future us.
     protected final Collection<Move<D, C, ? extends Piece<D, T, C>>> legalMoves;
 
     public Piece(C color, T position) {
@@ -23,6 +26,9 @@ public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C ex
     public boolean canMove(T destination) {
         for (var move : legalMoves) {
             T pos = this.position;
+
+            //TODO:
+            // We should just have an attribute that is the final position of the move.
 
             // Get the final position of the move
             for (var d : move.direction){
@@ -64,6 +70,9 @@ public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C ex
     public boolean canCapture(T destination) {
         for (var move : legalMoves) {
             T pos = this.position;
+
+            //TODO:
+            // We should just have an attribute that is the final position of the move.
 
             // Get the final position of the move
             for (var d : move.direction){

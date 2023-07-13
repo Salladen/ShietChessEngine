@@ -5,6 +5,9 @@ import ChessLogic.ENUMS.Direction;
 import ChessLogic.TileNode;
 import static ChessLogic.ENUMS.Direction.*;
 
+//TODO: These generics are getting out of hand, but should not be set to Piece here, but propagated from Knight
+// These will be a massive pain to work with, but it will help when initializing different boards.
+// Architecture is (a pain but) hard to change after all, so we might as well make it easier for future us.
 public class Pawn extends Piece<Direction, TileNode<Direction, Colors>, Colors> {
     boolean passantAble = false;
     boolean startingPosition = true;
@@ -71,6 +74,8 @@ public class Pawn extends Piece<Direction, TileNode<Direction, Colors>, Colors> 
                 this.legalMoves.add(new Move<>(new Direction[]{d}, dest.occupant)); // Capture
             }
 
+            //TODO: This en passant check should when not in proximity to applicable rows
+            // Distance from pawn to outermost row is 2 so that could be used
             if (dest.occupant instanceof Pawn possiblePassant && ((Pawn) dest.occupant).passantAble){
                 this.legalMoves.add(new Move<>(new Direction[]{d}, possiblePassant)); // En passant
             }
