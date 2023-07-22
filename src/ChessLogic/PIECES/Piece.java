@@ -10,17 +10,19 @@ import java.util.*;
 public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C extends Colors> {
     public T position;
     final C color;
-    //TODO: This should be a set, not a collection.
     // This is a prime example of our generics getting out of hand, but it will simply be cryptic in docstrings in the future and not a pain to work with,
     // so yet again, we might as well make it easier for future us.
-    protected final Collection<Move<D, C, ? extends Piece<D, T, C>>> legalMoves;
+    protected final Set<Move<D, C, ? extends Piece<D, T, C>>> legalMoves;
+    protected boolean isPinned = false;
 
     public Piece(C color, T position) {
         this.color = color;
         this.position = position;
-        this.legalMoves = new ArrayList<>(3);
+        this.legalMoves = new HashSet<>(3);
     }
 
+    // This should be only be subscribed to something that updates it when a RELEVANT piece moves
+    // The board object is responsible for handling pinning and check so the piece does not need to know about it
     public abstract void updateLegalMoves();
 
     public boolean canMove(T destination) {
@@ -61,9 +63,7 @@ public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C ex
 
         // Assumes that the move is legal
         destination.occupant = null;
-        // stealFrom is essentially just the same as moveTo
-        // The sole reason for it existing is to contrast capture from move so that the code is differentiable
-        destination.stealFrom(this.position);
+        this.position.moveTo(destination);
         return true;
     }
 

@@ -30,16 +30,4 @@ public class TileNode <D extends Direction, C extends Colors> {
         this.occupant = null;
         return true;
     }
-
-    public boolean stealFrom(TileNode<D, C> destination) {
-        //TODO: Remove this method and replace it with moveTo
-
-        if (this.occupant != null) {
-            return false;
-        }
-
-        this.occupant = destination.occupant;
-        destination.occupant = null;
-        return true;
-    }
 }

@@ -5,7 +5,7 @@ import ChessLogic.ENUMS.Direction;
 import ChessLogic.TileNode;
 import static ChessLogic.ENUMS.Direction.*;
 
-//TODO: These generics are getting out of hand, but should not be set to Piece here, but propagated from Knight
+// These generics are getting out of hand, but should not be set to Piece here, but propagated from Knight
 // These will be a massive pain to work with, but it will help when initializing different boards.
 // Architecture is (a pain but) hard to change after all, so we might as well make it easier for future us.
 public class Pawn extends Piece<Direction, TileNode<Direction, Colors>, Colors> {
@@ -26,7 +26,7 @@ public class Pawn extends Piece<Direction, TileNode<Direction, Colors>, Colors> 
         // Assumes that the move is legal
         this.position.moveTo(destination);
         this.startingPosition = false;
-        if (destination.getNeighbour(UP).occupant != null){
+        if (destination.getNeighbour(UP) != null){
             this.promotion = true;
         }
 
@@ -39,11 +39,8 @@ public class Pawn extends Piece<Direction, TileNode<Direction, Colors>, Colors> 
             return false;
         }
 
-        // Assumes that the move is legal
         destination.occupant = null;
-        // stealFrom is essentially just the same as moveTo
-        // The sole reason for it existing is to contrast capture from move so that the code is differentiable
-        destination.stealFrom(this.position);
+        this.position.moveTo(destination);
         this.startingPosition = false;
         if (destination.getNeighbour(UP).occupant != null){
             this.promotion = true;
@@ -74,9 +71,20 @@ public class Pawn extends Piece<Direction, TileNode<Direction, Colors>, Colors> 
                 this.legalMoves.add(new Move<>(new Direction[]{d}, dest.occupant)); // Capture
             }
 
-            //TODO: This en passant check should when not in proximity to applicable rows
-            // Distance from pawn to outermost row is 2 so that could be used
-            if (dest.occupant instanceof Pawn possiblePassant && ((Pawn) dest.occupant).passantAble){
+
+            Direction[] path = {UP, UP, UP, UP}; // If this is ends up in null, then it's close enough to the opponent starting row
+            boolean enPassantFeasible;
+            TileNode<Direction, Colors> temp_dest = this.position;
+            for (Direction dir : path){
+                temp_dest = temp_dest.getNeighbour(dir);
+                if (temp_dest == null){
+                    // We've landed on the outermost row
+                    break;
+                }
+            }
+            enPassantFeasible = temp_dest == null; // If we've landed on the outermost row, then we can en passant
+
+            if (enPassantFeasible && dest.occupant instanceof Pawn possiblePassant && ((Pawn) dest.occupant).passantAble){
                 this.legalMoves.add(new Move<>(new Direction[]{d}, possiblePassant)); // En passant
             }
         }
