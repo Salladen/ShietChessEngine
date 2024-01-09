@@ -1,24 +1,24 @@
-package ChessLogic.PIECES;
+package ChessLogic.PIECES.Standard;
 
 import ChessLogic.ENUMS.Colors;
 import ChessLogic.ENUMS.Direction;
-import ChessLogic.GAME_SYS.Move;
-import ChessLogic.GAME_SYS.TileNode;
+import ChessLogic.GAME_SYS.Standard.Move;
+import ChessLogic.GAME_SYS.Standard.TileNode;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-
-public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C extends Colors> {
-    public T position;
-    public final C color;
-
-    protected Set<Move<D, C, ? extends Piece<D, T, C>>> pinnedBy;
+public abstract class Piece extends ChessLogic.PIECES.Piece<Direction, TileNode, Colors> {
+    public TileNode position;
+    public final Colors color;
+    protected Set<Move> pinnedBy;
 
     // This is a prime example of our generics getting out of hand, but it will simply be cryptic in docstrings in the future and not a pain to work with,
     // so yet again, we might as well make it easier for future us.
-    protected final Set<Move<D, C, ? extends Piece<D, T, C>>> legalMoves;
+    protected final Set<Move> legalMoves;
 
-    public Piece(C color, T position) {
+    public Piece(Colors color, TileNode position) {
+        super(color, position);
         this.color = color;
         this.position = position;
 
@@ -29,20 +29,21 @@ public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C ex
     // The board object is responsible for handling pinning and check so the piece does not need to know about it
     public abstract void updateLegalMoves();
 
-    public boolean canMove(T destination) {
+    @Override
+    public boolean canMove(TileNode destination) {
         for (var move : legalMoves) {
-            T pos = this.position;
+            TileNode pos = this.position;
 
             //TODO:
             // We should just have an attribute that is the final position of the move.
 
             // Get the final position of the move
-            for (var d : move.direction){
-                pos = (T) this.position.getNeighbour(d); // Unchecked cast but <T> is an extension of TileNode<D, C> so it is safe
+            for (var d : move.direction) {
+                pos = this.position.getNeighbour(d); // Unchecked cast but <T> is an extension of TileNode<D, C> so it is safe
             }
 
             // Check if the final position is the destination and that the move does not capture a piece
-            if (pos == destination && move.capturedPiece == null){
+            if (pos == destination && move.capturedPiece == null) {
                 return true;
             }
         }
@@ -50,7 +51,7 @@ public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C ex
         return false;
     }
 
-    public boolean move(T destination) {
+    public boolean move(TileNode destination) {
         if (!this.canMove(destination)) {
             return false;
         }
@@ -60,7 +61,7 @@ public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C ex
         return true;
     }
 
-    public boolean capture(T destination) {
+    public boolean capture(TileNode destination) {
         if (!this.canCapture(destination)) {
             return false;
         }
@@ -71,21 +72,21 @@ public abstract class Piece <D extends Direction, T extends TileNode<D, C>, C ex
         return true;
     }
 
-    public boolean canCapture(T destination) {
+    public boolean canCapture(TileNode destination) {
         for (var move : legalMoves) {
-            T pos = this.position;
+            TileNode pos = this.position;
 
             //TODO:
             // We should just have an attribute that is the final position of the move.
 
             // Get the final position of the move
-            for (var d : move.direction){
+            for (var d : move.direction) {
                 // assert that T is an extension of TileNode<D, C>
-                pos = (T) this.position.getNeighbour(d); // Unchecked cast but <T> is an extension of TileNode<D, C> so it is safe
+                pos = this.position.getNeighbour(d); // Unchecked cast but <T> is an extension of TileNode<D, C> so it is safe
             }
 
             // Check if the final position is the destination and that the move captures a piece
-            if (pos == destination && move.capturedPiece != null){
+            if (pos == destination && move.capturedPiece != null) {
                 return true;
             }
         }

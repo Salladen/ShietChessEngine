@@ -2,5 +2,9 @@ package ChessLogic.ENUMS;
 
 public enum Colors {
     WHITE,
-    BLACK
+    BLACK;
+
+    public Colors getOpposite() {
+        return this == WHITE ? BLACK : WHITE;
+    }
 }

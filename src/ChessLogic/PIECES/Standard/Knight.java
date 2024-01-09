@@ -1,14 +1,12 @@
-package ChessLogic.PIECES;
+package ChessLogic.PIECES.Standard;
 
 import ChessLogic.ENUMS.Colors;
 import ChessLogic.ENUMS.Direction;
-import ChessLogic.TileNode;
+import ChessLogic.GAME_SYS.Standard.TileNode;
+import ChessLogic.GAME_SYS.Standard.Move;
 
-// These generics are getting out of hand, but should not be set to Piece here, but propagated from Knight
-// These will be a massive pain to work with, but it will help when initializing different boards.
-// Architecture is (a pain but) hard to change after all, so we might as well make it easier for future us.
-public class Knight extends Piece<Direction, TileNode<Direction, Colors>, Colors> {
-    public Knight(Colors color, TileNode<Direction, Colors> position) {
+public class Knight extends Piece {
+    public Knight(Colors color, TileNode position) {
         super(color, position);
     }
 
@@ -34,7 +32,7 @@ public class Knight extends Piece<Direction, TileNode<Direction, Colors>, Colors
             //TODO:
             // We should just have an attribute that is the final position of the move.
 
-            TileNode<Direction, Colors> pos = this.position;
+            TileNode pos = this.position;
             for (Direction d : dirs) {
                 pos = pos.getNeighbour(d);
 
@@ -44,7 +42,7 @@ public class Knight extends Piece<Direction, TileNode<Direction, Colors>, Colors
             }
 
             if (pos.occupant == null || pos.occupant.color != this.color) {
-                this.legalMoves.add(new Move<>(dirs, pos.occupant));
+                this.legalMoves.add(new Move(this.position, dirs, pos.occupant));
             }
         }
     }

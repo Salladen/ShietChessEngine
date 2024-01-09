@@ -1,13 +1,14 @@
-package ChessLogic.PIECES;
+package ChessLogic.PIECES.Standard;
 
 import ChessLogic.ENUMS.Colors;
 import ChessLogic.ENUMS.Direction;
-import ChessLogic.TileNode;
+import ChessLogic.GAME_SYS.Standard.TileNode;
+import ChessLogic.GAME_SYS.Standard.Move;
 
-public class King extends Piece<Direction, TileNode<Direction, Colors>, Colors> {
+public class King extends Piece {
     boolean hasMoved = false;
 
-    public King(Colors color, TileNode<Direction, Colors> position) {
+    public King(Colors color, TileNode position) {
         super(color, position);
     }
 
@@ -19,30 +20,29 @@ public class King extends Piece<Direction, TileNode<Direction, Colors>, Colors> 
                 Direction.DOWN_LEFT, Direction.DOWN, Direction.DOWN_RIGHT
         };
 
-        for (Direction dir : directions){
-            TileNode<Direction, Colors> pos = this.position.getNeighbour(dir);
+        for (Direction dir : directions) {
+            TileNode pos = this.position.getNeighbour(dir);
 
-            if (pos == null){
+            if (pos == null) {
                 // This is out of bounds
                 continue;
             }
 
-            if (pos.occupant == null){
+            if (pos.occupant == null) {
                 // This is an empty tile
-                this.legalMoves.add(new Move<>(new Direction[]{dir}, null));
-            }
-            else if (pos.occupant.color != this.color){
+                this.legalMoves.add(new Move(this.position, new Direction[]{dir}, null));
+            } else if (pos.occupant.color != this.color) {
                 // This is an enemy piece
-                this.legalMoves.add(new Move<>(new Direction[]{dir}, pos.occupant));
+                this.legalMoves.add(new Move(this.position, new Direction[]{dir}, pos.occupant));
             }
         }
 
-        // The board handles cases were the king is in check, or a tile in path being threatened
+        // The board handles cases where the king is in check, or a tile in the path is being threatened
         updateCastlingMoves();
     }
 
-    public void updateCastlingMoves(){
-        if (this.hasMoved){
+    public void updateCastlingMoves() {
+        if (this.hasMoved) {
             return;
         }
 
@@ -50,7 +50,7 @@ public class King extends Piece<Direction, TileNode<Direction, Colors>, Colors> 
 
         // Cast a ray in each direction
         for (Direction dir : directions) {
-            TileNode<Direction, Colors> pos = this.position;
+            TileNode pos = this.position;
             while (true) {
                 pos = pos.getNeighbour(dir);
 
@@ -67,13 +67,12 @@ public class King extends Piece<Direction, TileNode<Direction, Colors>, Colors> 
                     continue;
                 } else {
                     // This is a friendly piece
-                    if (pos.occupant instanceof Rook) {
-                        Rook rook = (Rook) pos.occupant;
+                    if (pos.occupant instanceof Rook rook) {
                         if (!rook.hasMoved && !this.hasMoved) {
                             // This is a friendly rook that hasn't moved
                             // and this is a friendly king that hasn't moved
                             // so castling is possible
-                            this.legalMoves.add(new Move<>(new Direction[]{dir}, pos.occupant));
+                            this.legalMoves.add(new Move(this.position, new Direction[]{dir}, pos.occupant));
                         }
                     }
                     break;
